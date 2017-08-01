@@ -59,7 +59,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Config.cs" />
+    <Compile Include="UnlimitedInventoriesConfig.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="PlayerInfo.cs" />
     <Compile Include="UnlimitedInventoriesCommands.cs" />

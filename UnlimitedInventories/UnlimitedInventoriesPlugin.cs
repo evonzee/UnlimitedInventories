@@ -58,7 +58,7 @@ namespace UnlimitedInventories
 			if (disposing)
 			{
 				_commands.Deregister();
-				File.WriteAllText(ConfigPath, JsonConvert.SerializeObject(Config.Instance, Formatting.Indented));
+				File.WriteAllText(ConfigPath, JsonConvert.SerializeObject(UnlimitedInventoriesConfig.Instance, Formatting.Indented));
 			}
 
 			base.Dispose(disposing);
@@ -71,11 +71,11 @@ namespace UnlimitedInventories
 		{
 			if (File.Exists(ConfigPath))
 			{
-				Config.Instance = JsonConvert.DeserializeObject<Config>(File.ReadAllText(ConfigPath));
+				UnlimitedInventoriesConfig.Instance = JsonConvert.DeserializeObject<UnlimitedInventoriesConfig>(File.ReadAllText(ConfigPath));
 			}
 
-			_database.ConnectDatabase();
 			_commands.Register();
+			_database.ConnectDatabase();
 		}
 	}
 }

@@ -156,7 +156,7 @@ namespace UnlimitedInventories
 
 			for (var i = 0; i < NetItem.MaxInventory; i++)
 			{
-				if (i < NetItem.InventorySlots)
+				if (i < NetItem.InventoryIndex.Item2)
 				{
 					player.TPlayer.inventory[i].netDefaults(inventory[i].NetId);
 
@@ -171,9 +171,9 @@ namespace UnlimitedInventories
 					NetMessage.SendData((int) PacketTypes.PlayerSlot, player.Index, -1,
 						NetworkText.FromLiteral(player.TPlayer.inventory[i].Name), player.Index, i, player.TPlayer.inventory[i].prefix);
 				}
-				else if (i < NetItem.InventorySlots + NetItem.ArmorSlots)
+				else if (i < NetItem.ArmorIndex.Item2)
 				{
-					index = i - NetItem.InventorySlots;
+					index = i - NetItem.ArmorIndex.Item1;
 
 					player.TPlayer.armor[index].netDefaults(inventory[i].NetId);
 
@@ -188,9 +188,9 @@ namespace UnlimitedInventories
 					NetMessage.SendData((int) PacketTypes.PlayerSlot, player.Index, -1,
 						NetworkText.FromLiteral(player.TPlayer.armor[index].Name), player.Index, i, player.TPlayer.armor[index].prefix);
 				}
-				else if (i < NetItem.InventorySlots + NetItem.ArmorSlots + NetItem.DyeSlots)
+				else if (i < NetItem.DyeIndex.Item2)
 				{
-					index = i - (NetItem.InventorySlots + NetItem.ArmorSlots);
+					index = i - NetItem.DyeIndex.Item1;
 
 					player.TPlayer.dye[index].netDefaults(inventory[i].NetId);
 
@@ -205,9 +205,9 @@ namespace UnlimitedInventories
 					NetMessage.SendData((int) PacketTypes.PlayerSlot, player.Index, -1,
 						NetworkText.FromLiteral(player.TPlayer.dye[index].Name), player.Index, i, player.TPlayer.dye[index].prefix);
 				}
-				else if (i < NetItem.InventorySlots + NetItem.ArmorSlots + NetItem.DyeSlots + NetItem.MiscEquipSlots)
+				else if (i < NetItem.MiscEquipIndex.Item2)
 				{
-					index = i - (NetItem.InventorySlots + NetItem.ArmorSlots + NetItem.DyeSlots);
+					index = i - NetItem.MiscEquipIndex.Item1;
 
 					player.TPlayer.miscEquips[index].netDefaults(inventory[i].NetId);
 
@@ -224,10 +224,9 @@ namespace UnlimitedInventories
 						NetworkText.FromLiteral(player.TPlayer.miscEquips[index].Name), player.Index, i,
 						player.TPlayer.miscEquips[index].prefix);
 				}
-				else if (i < NetItem.InventorySlots + NetItem.ArmorSlots + NetItem.DyeSlots + NetItem.MiscEquipSlots +
-				         NetItem.MiscDyeSlots)
+				else if (i < NetItem.MiscDyeIndex.Item2)
 				{
-					index = i - (NetItem.InventorySlots + NetItem.ArmorSlots + NetItem.DyeSlots + NetItem.MiscEquipSlots);
+					index = i - NetItem.MiscDyeIndex.Item1;
 
 					player.TPlayer.miscDyes[index].netDefaults(inventory[i].NetId);
 
@@ -243,6 +242,80 @@ namespace UnlimitedInventories
 					NetMessage.SendData((int) PacketTypes.PlayerSlot, player.Index, -1,
 						NetworkText.FromLiteral(player.TPlayer.miscDyes[index].Name), player.Index, i,
 						player.TPlayer.miscDyes[index].prefix);
+				}
+				else if (i < NetItem.PiggyIndex.Item2)
+				{
+					index = i - NetItem.PiggyIndex.Item1;
+
+					player.TPlayer.bank.item[index].netDefaults(inventory[i].NetId);
+
+					if (player.TPlayer.bank.item[index].netID != 0)
+					{
+						player.TPlayer.bank.item[index].prefix = inventory[i].PrefixId;
+						player.TPlayer.bank.item[index].stack = inventory[i].Stack;
+					}
+
+					NetMessage.SendData((int) PacketTypes.PlayerSlot, -1, -1,
+						NetworkText.FromLiteral(player.TPlayer.bank.item[index].Name), player.Index, i,
+						player.TPlayer.bank.item[index].prefix);
+					NetMessage.SendData((int)PacketTypes.PlayerSlot, player.Index, -1,
+						NetworkText.FromLiteral(player.TPlayer.bank.item[index].Name), player.Index, i,
+						player.TPlayer.bank.item[index].prefix);
+				}
+				else if (i < NetItem.SafeIndex.Item2)
+				{
+					index = i - NetItem.SafeIndex.Item1;
+
+					player.TPlayer.bank2.item[index].netDefaults(inventory[i].NetId);
+
+					if (player.TPlayer.bank2.item[index].netID != 0)
+					{
+						player.TPlayer.bank2.item[index].prefix = inventory[i].PrefixId;
+						player.TPlayer.bank2.item[index].stack = inventory[i].Stack;
+					}
+
+					NetMessage.SendData((int)PacketTypes.PlayerSlot, -1, -1,
+						NetworkText.FromLiteral(player.TPlayer.bank2.item[index].Name), player.Index, i,
+						player.TPlayer.bank2.item[index].prefix);
+					NetMessage.SendData((int)PacketTypes.PlayerSlot, player.Index, -1,
+						NetworkText.FromLiteral(player.TPlayer.bank2.item[index].Name), player.Index, i,
+						player.TPlayer.bank2.item[index].prefix);
+				}
+				else if (i < NetItem.TrashIndex.Item2)
+				{
+					player.TPlayer.trashItem.netDefaults(inventory[i].NetId);
+
+					if (player.TPlayer.trashItem.netID != 0)
+					{
+						player.TPlayer.trashItem.prefix = inventory[i].PrefixId;
+						player.TPlayer.trashItem.stack = inventory[i].Stack;
+					}
+
+					NetMessage.SendData((int)PacketTypes.PlayerSlot, -1, -1,
+						NetworkText.FromLiteral(player.TPlayer.trashItem.Name), player.Index, i,
+						player.TPlayer.trashItem.prefix);
+					NetMessage.SendData((int)PacketTypes.PlayerSlot, player.Index, -1,
+						NetworkText.FromLiteral(player.TPlayer.trashItem.Name), player.Index, i,
+						player.TPlayer.trashItem.prefix);
+				}
+				else if (i < NetItem.ForgeIndex.Item2)
+				{
+					index = i - NetItem.ForgeIndex.Item1;
+
+					player.TPlayer.bank3.item[index].netDefaults(inventory[i].NetId);
+
+					if (player.TPlayer.bank3.item[index].netID != 0)
+					{
+						player.TPlayer.bank3.item[index].prefix = inventory[i].PrefixId;
+						player.TPlayer.bank3.item[index].stack = inventory[i].Stack;
+					}
+
+					NetMessage.SendData((int)PacketTypes.PlayerSlot, -1, -1,
+						NetworkText.FromLiteral(player.TPlayer.bank3.item[index].Name), player.Index, i,
+						player.TPlayer.bank3.item[index].prefix);
+					NetMessage.SendData((int)PacketTypes.PlayerSlot, player.Index, -1,
+						NetworkText.FromLiteral(player.TPlayer.bank3.item[index].Name), player.Index, i,
+						player.TPlayer.bank3.item[index].prefix);
 				}
 			}
 
@@ -286,7 +359,7 @@ namespace UnlimitedInventories
 				return true;
 			}
 
-			var config = Config.Instance;
+			var config = UnlimitedInventoriesConfig.Instance;
 			var playerInfo = _cache[player.User.ID];
 			if (playerInfo.HasInventory(inventoryName))
 			{
@@ -315,6 +388,11 @@ namespace UnlimitedInventories
 		/// <param name="inventoryName">The inventory's name.</param>
 		public void LoadInventory(TSPlayer player, string inventoryName)
 		{
+			if (!_cache.ContainsKey(player.User.ID))
+			{
+				return;
+			}
+
 			var inventory = _cache[player.User.ID].Inventories[inventoryName];
 			ApplyInventory(player, inventory);
 		}

@@ -3,12 +3,12 @@
 	/// <summary>
 	/// Represents the UnlimitedInventories configuration.
 	/// </summary>
-	public sealed class Config
+	public sealed class UnlimitedInventoriesConfig
 	{
 		/// <summary>
 		/// Gets the UnlimitedInventories configuration instance.
 		/// </summary>
-		public static Config Instance { get; internal set; } = new Config();
+		public static UnlimitedInventoriesConfig Instance { get; internal set; } = new UnlimitedInventoriesConfig();
 
 		/// <summary>
 		/// Gets the inventory limit.
