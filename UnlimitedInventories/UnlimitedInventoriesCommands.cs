@@ -1,8 +1,9 @@
-﻿using TShockAPI;
+﻿using System;
+using TShockAPI;
 
 namespace UnlimitedInventories
 {
-	internal sealed class UnlimitedInventoriesCommands
+	internal sealed class UnlimitedInventoriesCommands : IDisposable
 	{
 		private readonly Database _database;
 
@@ -13,20 +14,13 @@ namespace UnlimitedInventories
 		public UnlimitedInventoriesCommands(Database database)
 		{
 			_database = database;
-		}
-
-		/// <summary>
-		/// Registers the commands.
-		/// </summary>
-		public void Register()
-		{
 			Commands.ChatCommands.Add(new Command("ui.root", ManageInventories, "inventory"));
 		}
 
 		/// <summary>
-		/// Deregisters the commands.
+		/// Disposes the command handler.
 		/// </summary>
-		public void Deregister()
+		public void Dispose()
 		{
 			Commands.ChatCommands.RemoveAll(c => c.CommandDelegate == ManageInventories);
 		}
@@ -141,21 +135,20 @@ namespace UnlimitedInventories
 							e.Player.SendErrorMessage($"Invalid syntax! Proper syntax: {Commands.Specifier}inventory list [page]");
 							return;
 						}
-						else
-						{
-							if (!PaginationTools.TryParsePageNumber(e.Parameters, 1, e.Player, out var pageNum))
-							{
-								return;
-							}
 
-							PaginationTools.SendPage(e.Player, pageNum, PaginationTools.BuildLinesFromTerms(player.GetInventoryNames),
-								new PaginationTools.Settings
-								{
-									HeaderFormat = "Inventories ({0}/{1})",
-									FooterFormat = $"Type {Commands.Specifier}inventory list {{0}} for more.",
-									NothingToDisplayString = "You have no inventories to display."
-								});
+
+						if (!PaginationTools.TryParsePageNumber(e.Parameters, 1, e.Player, out var pageNum))
+						{
+							return;
 						}
+
+						PaginationTools.SendPage(e.Player, pageNum, PaginationTools.BuildLinesFromTerms(player.GetInventoryNames),
+							new PaginationTools.Settings
+							{
+								HeaderFormat = "Inventories ({0}/{1})",
+								FooterFormat = $"Type {Commands.Specifier}inventory list {{0}} for more.",
+								NothingToDisplayString = "You have no inventories to display."
+							});
 					}
 					break;
 			}

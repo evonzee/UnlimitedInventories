@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Data;
@@ -14,7 +15,7 @@ namespace UnlimitedInventories
 	/// <summary>
 	/// Represents the UnlimitedInventories database manager.
 	/// </summary>
-	public sealed class Database
+	public sealed class Database : IDisposable
 	{
 		private readonly Dictionary<int, PlayerInfo> _cache = new Dictionary<int, PlayerInfo>();
 		private IDbConnection _db;
@@ -28,7 +29,7 @@ namespace UnlimitedInventories
 			{
 				case "mysql":
 					string[] dbHost = TShock.Config.MySqlHost.Split(':');
-					_db = new MySqlConnection()
+					_db = new MySqlConnection
 					{
 						ConnectionString = string.Format("Server={0}; Port={1}; Database={2}; Uid={3}; Pwd={4};",
 							dbHost[0],
@@ -55,6 +56,14 @@ namespace UnlimitedInventories
 				new SqlColumn("Inventory", MySqlDbType.Text)));
 
 			LoadDatabase();
+		}
+
+		/// <summary>
+		/// Disposes the database manager.
+		/// </summary>
+		public void Dispose()
+		{
+			_db.Dispose();
 		}
 
 		private void LoadDatabase()
@@ -353,28 +362,27 @@ namespace UnlimitedInventories
 			{
 				_cache.Add(player.User.ID,
 					new PlayerInfo(player.User.ID, new Dictionary<string, NetItem[]> {[inventoryName] = inventory}));
-				_db.Query("INSERT INTO UnlimitedInventories(UserID, Name, Inventory) VALUES (@0, @1, @2);", player.User.ID,
-					inventoryName,
-					string.Join("~", inventory));
-				return true;
 			}
-
-			var config = UnlimitedInventoriesConfig.Instance;
-			var playerInfo = _cache[player.User.ID];
-			if (playerInfo.HasInventory(inventoryName))
+			else
 			{
-				_cache[player.User.ID].Inventories[inventoryName] = inventory;
-				_db.Query(
-					$"UPDATE UnlimitedInventories SET Inventory = {string.Join("~", inventory)} WHERE UserID = {player.User.ID}");
-				return true;
+				var config = UnlimitedInventoriesConfig.Instance;
+				var playerInfo = _cache[player.User.ID];
+				if (playerInfo.HasInventory(inventoryName))
+				{
+					_cache[player.User.ID].Inventories[inventoryName] = inventory;
+					_db.Query(
+						$"UPDATE UnlimitedInventories SET Inventory = {string.Join("~", inventory)} WHERE UserID = {player.User.ID}");
+					return true;
+				}
+
+				if (playerInfo.Inventories.Count + 1 > config.InventoryLimit && !player.HasPermission(config.BypassPermission))
+				{
+					return false;
+				}
+
+				_cache[player.User.ID].Inventories.Add(inventoryName, inventory);
 			}
 
-			if (playerInfo.Inventories.Count + 1 > config.InventoryLimit && !player.HasPermission(config.BypassPermission))
-			{
-				return false;
-			}
-
-			_cache[player.User.ID].Inventories.Add(inventoryName, inventory);
 			_db.Query("INSERT INTO UnlimitedInventories(UserID, Name, Inventory) VALUES (@0, @1, @2);", player.User.ID,
 				inventoryName,
 				string.Join("~", inventory));

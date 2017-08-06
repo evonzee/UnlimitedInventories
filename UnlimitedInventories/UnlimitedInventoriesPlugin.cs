@@ -16,8 +16,8 @@ namespace UnlimitedInventories
 	{
 		private static readonly string ConfigPath = Path.Combine(TShock.SavePath, "unlimitedinventoriesconfig.json");
 
-		private readonly UnlimitedInventoriesCommands _commands;
-		private readonly Database _database;
+		private UnlimitedInventoriesCommands _commands;
+		private Database _database;
 
 		/// <summary>
 		/// Gets the plugin's author.
@@ -45,8 +45,6 @@ namespace UnlimitedInventories
 		/// <param name="game">The Main instance.</param>
 		public UnlimitedInventoriesPlugin(Main game) : base(game)
 		{
-			_database = new Database();
-			_commands = new UnlimitedInventoriesCommands(_database);
 		}
 
 		/// <summary>
@@ -57,7 +55,8 @@ namespace UnlimitedInventories
 		{
 			if (disposing)
 			{
-				_commands.Deregister();
+				_commands.Dispose();
+				_database.Dispose();
 				File.WriteAllText(ConfigPath, JsonConvert.SerializeObject(UnlimitedInventoriesConfig.Instance, Formatting.Indented));
 			}
 
@@ -74,7 +73,9 @@ namespace UnlimitedInventories
 				UnlimitedInventoriesConfig.Instance = JsonConvert.DeserializeObject<UnlimitedInventoriesConfig>(File.ReadAllText(ConfigPath));
 			}
 
-			_commands.Register();
+			_database = new Database();
+			_commands = new UnlimitedInventoriesCommands(_database);
+
 			_database.ConnectDatabase();
 		}
 	}
