@@ -370,8 +370,8 @@ namespace UnlimitedInventories
 				if (playerInfo.HasInventory(inventoryName))
 				{
 					_cache[player.User.ID].Inventories[inventoryName] = inventory;
-					_db.Query(
-						$"UPDATE UnlimitedInventories SET Inventory = {string.Join("~", inventory)} WHERE UserID = {player.User.ID}");
+                    TSPlayer.Server.SendInfoMessage($"Updating existing inventory {inventoryName}");
+					_db.Query("UPDATE UnlimitedInventories SET Inventory = @2 WHERE UserID = @0 and Name = @1", player.User.ID, inventoryName, string.Join("~", inventory));
 					return true;
 				}
 
@@ -383,7 +383,8 @@ namespace UnlimitedInventories
 				_cache[player.User.ID].Inventories.Add(inventoryName, inventory);
 			}
 
-			_db.Query("INSERT INTO UnlimitedInventories(UserID, Name, Inventory) VALUES (@0, @1, @2);", player.User.ID,
+            TSPlayer.Server.SendInfoMessage($"Creating new inventory {inventoryName}");
+            _db.Query("INSERT INTO UnlimitedInventories(UserID, Name, Inventory) VALUES (@0, @1, @2);", player.User.ID,
 				inventoryName,
 				string.Join("~", inventory));
 			return true;
@@ -418,7 +419,8 @@ namespace UnlimitedInventories
 			}
 
 			_cache[player.User.ID].Inventories.Remove(inventoryName);
-			_db.Query($"DELETE FROM UnlimitedInventories WHERE UserID = {player.User.ID} AND Name = {inventoryName}");
+            TSPlayer.Server.SendInfoMessage($"Deleting inventory {inventoryName}");
+            _db.Query($"DELETE FROM UnlimitedInventories WHERE UserID = @0 AND Name = @1", player.User.ID, inventoryName);
 		}
 	}
 }
